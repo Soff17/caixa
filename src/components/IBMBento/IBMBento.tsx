@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Box, Typography, Grid, IconButton, Tooltip } from '@mui/material';
 import { Launch } from '@mui/icons-material';
+
 const technologies = [
     { name: 'Watsonx.ai', img: '/logos/watsonx.png', link: '#' },
     { name: 'Orchestrate', img: '/logos/orchestrate.png', link: '#' },
@@ -10,6 +11,11 @@ const technologies = [
     { name: 'Calendar', img: '/logos/calendar.png', link: '#' }
 ];
 
+declare global {
+  interface Window {
+    webChatInstance?: any;
+  }
+}
 
 const IBMBento = () => {
   useEffect(() => {
@@ -23,7 +29,10 @@ const IBMBento = () => {
           minimizeButtonIconType: 'close',
           showRestartButton: false
         },
+        showLauncher: false,
         onLoad: async (instance) => {
+          window.webChatInstance = instance;
+        
           const invokeInitial = {
             input: {
               message_type: 'text',
@@ -32,19 +41,29 @@ const IBMBento = () => {
           };
           const sendOptions = { silent: true };
         
-          // Guardar la original por si la necesitas
           const originalRestart = instance.restartConversation.bind(instance);
         
-          // Redefinir restart para siempre mandar 'IBM' al reiniciar
           instance.restartConversation = async function (...args) {
             await originalRestart(...args);
             await instance.send(invokeInitial, sendOptions).catch(console.error);
           };
         
+          instance.on({
+            type: 'view:change',
+            handler: (event) => {
+              const launcherBtn = document.querySelector('.custom-launcher');
+              if (event.newViewState.mainWindow) {
+                launcherBtn.style.display = 'none';
+              } else {
+                launcherBtn.style.display = '';
+              }
+            },
+          });
+        
           await instance.updateLocale('es');
           await instance.render();
           await instance.restartConversation();
-        }        
+        }          
       };
       setTimeout(function(){
         const t = document.createElement('script');
@@ -90,6 +109,37 @@ const IBMBento = () => {
 
   return (
     <Box sx={{ backgroundColor: '#0f0f0f', minHeight: '100vh', px: 3, py: 6 }}>
+      {/* Botón flotante personalizado para abrir Watson Assistant */}
+      <Box
+        className="custom-launcher"
+        onClick={() => {
+          window?.webChatInstance?.changeView('mainWindow');
+        }}
+        sx={{
+          position: 'fixed',
+          bottom: 24,
+          right: 24,
+          zIndex: 9999,
+          width: 100,
+          height: 100,
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, #1f70c1, #354de8)',
+          color: '#fff',
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-3px) scale(1.25)',
+            boxShadow: '0 12px 28px rgba(0, 0, 0, 0.5)',
+          },
+        }}
+      >
+        <Box sx={{ fontSize: 28 }}><img src="/logos/bot.png" alt="IBM" style={{ width: '100%', objectFit: 'contain' }} /></Box>
+      </Box>
+
       <Grid container spacing={2}>
         <Grid item xs={12} md={6} sx={{}}>
           <Box sx={{ ...cardStyle}} >
