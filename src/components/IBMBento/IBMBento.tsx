@@ -11,9 +11,18 @@ const technologies = [
     { name: 'Calendar', img: '/logos/calendar.png', link: '#' }
 ];
 
+interface WatsonChatInstance {
+  changeView: (view: string) => void;
+  restartConversation: (...args: unknown[]) => Promise<void>;
+  send: (message: { input: { message_type: string; text: string } }, options: { silent: boolean }) => Promise<void>;
+  on: (event: { type: string; handler: (e: { newViewState: { mainWindow: boolean } }) => void }) => void;
+  updateLocale: (locale: string) => Promise<void>;
+  render: () => Promise<void>;
+}
+
 declare global {
   interface Window {
-    webChatInstance?: any;
+    webChatInstance?: WatsonChatInstance;
   }
 }
 
