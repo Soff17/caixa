@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react'; // añade useState
 import { Box, Typography, Grid, IconButton, Tooltip } from '@mui/material';
 import { Launch } from '@mui/icons-material';
 
@@ -27,6 +27,7 @@ declare global {
 }
 
 const IBMBento = () => {
+  const [isChatOpen, setIsChatOpen] = useState(false);
   useEffect(() => {
     const script = document.createElement('script');
     script.innerHTML = `
@@ -39,6 +40,9 @@ const IBMBento = () => {
           showRestartButton: false
         },
         showLauncher: false,
+        layout: {
+          showFrame: false,
+        },
         onLoad: async (instance) => {
           window.webChatInstance = instance;
         
@@ -63,8 +67,10 @@ const IBMBento = () => {
               const launcherBtn = document.querySelector('.custom-launcher');
               if (event.newViewState.mainWindow) {
                 launcherBtn.style.display = 'none';
+                window.dispatchEvent(new CustomEvent("watson-chat-open", { detail: true }));
               } else {
                 launcherBtn.style.display = '';
+                window.dispatchEvent(new CustomEvent("watson-chat-open", { detail: false }));
               }
             },
           });
@@ -84,6 +90,15 @@ const IBMBento = () => {
     `;
     document.body.appendChild(script);
   }, []);
+  
+  useEffect(() => {
+    const listener = (e: CustomEvent) => {
+      setIsChatOpen(e.detail);
+    };
+  
+    window.addEventListener('watson-chat-open', listener as EventListener);
+    return () => window.removeEventListener('watson-chat-open', listener as EventListener);
+  }, []);  
   
 
   const cardStyle = {
@@ -117,7 +132,7 @@ const IBMBento = () => {
   };  
 
   return (
-    <Box sx={{ backgroundColor: '#0f0f0f', minHeight: '100vh', px: 3, py: 6 }}>
+    <Box sx={{ backgroundColor: isChatOpen ? '#1f70c1' : '#0f0f0f', minHeight: '100vh', px: 3, py: 6 }}>
       {/* Botón flotante personalizado para abrir Watson Assistant */}
       <Box
         className="custom-launcher"
@@ -149,6 +164,7 @@ const IBMBento = () => {
         <Box sx={{ fontSize: 28 }}><img src="/logos/bot.png" alt="IBM" style={{ width: '100%', objectFit: 'contain' }} /></Box>
       </Box>
 
+      {!isChatOpen && (
       <Grid container spacing={2}>
         <Grid item xs={12} md={6} sx={{}}>
           <Box sx={{ ...cardStyle}} >
@@ -268,7 +284,7 @@ const IBMBento = () => {
 
 
         <Grid item xs={12} md={2}>
-          <Box sx={{ ...cardStyle, backgroundColor:'#b3a100'}}>
+          <Box sx={{ ...cardStyle, backgroundColor:'#1f70c1'}}>
             <img src="/logos/bot.png" alt="IBM" style={{ width: '100%', objectFit: 'contain' }} />
           </Box>
         </Grid>
@@ -283,6 +299,7 @@ const IBMBento = () => {
         </Grid>
         
       </Grid>
+      )}
     </Box>
   );
 };
