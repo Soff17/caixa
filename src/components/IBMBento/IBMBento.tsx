@@ -5,10 +5,7 @@ import { Launch } from '@mui/icons-material';
 const technologies = [
     { name: 'Watsonx.ai', img: '/logos/watsonx.png', link: '#' },
     { name: 'Orchestrate', img: '/logos/orchestrate.png', link: '#' },
-    { name: 'Discovery', img: '/logos/discovery.png', link: '#' },
-    { name: 'OpenAPI', img: '/logos/openapi.png', link: '#' },
-    { name: 'Gmail', img: '/logos/gmail.png', link: '#' },
-    { name: 'Calendar', img: '/logos/calendar.png', link: '#' }
+    { name: 'Discovery', img: '/logos/discovery.png', link: '#' }
 ];
 
 interface WatsonChatInstance {
@@ -189,7 +186,7 @@ const IBMBento = () => {
         <Grid item xs={12} md={4}>
           <Box sx={{ ...cardStyle}} >
             <Typography variant="h4" fontWeight="bold" sx={{ mb: 2 }}>Tecnologías</Typography>
-            <Grid container spacing={2} justifyContent="flex-start" sx={{paddingTop:2}}>
+            <Grid container spacing={2} justifyContent="flex-start" sx={{paddingTop:5, paddingBottom:5}}>
                 {technologies.map((tech, index) => (
                   <Grid item xs={6} sm={4} md={3} lg={4} key={index}>
                     <Tooltip title={tech.name} placement="top">
@@ -242,7 +239,7 @@ const IBMBento = () => {
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
               <Box sx={{ ...chipStyle}}>📄 Base de conocimiento con CV en PDF</Box>
               <Box sx={{ ...chipStyle}}>🤖 AI para sugerencias de candidatos</Box>
-              <Box sx={{ ...chipStyle}}>📬 Skills para envar correos y agendar publicación</Box>
+              <Box sx={{ ...chipStyle}}>📬 Skills para enviar correos y agendar publicación</Box>
               <Box sx={{ ...chipStyle}}>✍️ AI para redactar correos y generar publicaciones</Box>
               <Box sx={{ ...chipStyle}}>🔗 Integración con APIs</Box>
             </Box>
@@ -258,7 +255,7 @@ const IBMBento = () => {
     sx={{
       ...cardStyle,
       position: 'relative',
-      overflow: 'hidden', // asegura que no se salga el video al hacer zoom
+      overflow: 'hidden', 
       p: 0, // sin padding para que el video se ajuste al 100%
     }}
   >
