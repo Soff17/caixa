@@ -253,26 +253,38 @@ const IBMBento = () => {
           </Box>
         </Grid>
 
-        <Grid item xs={6} md={8}>
-          <Box sx={{ ...cardStyle }}>
-          <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              style={{
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                zIndex: 0,
-              }}
-            >
-              <source src="/logos/demo.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </Box>
-        </Grid>
+        <Grid item xs={12} md={8}>
+  <Box
+    sx={{
+      ...cardStyle,
+      position: 'relative',
+      overflow: 'hidden', // asegura que no se salga el video al hacer zoom
+      p: 0, // sin padding para que el video se ajuste al 100%
+    }}
+  >
+    <video
+      autoPlay
+      loop
+      muted
+      playsInline
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        objectFit: 'fill', // aquí se hace el "cover"
+        zIndex: 0,
+        transform: 'scale(1.1)', // zoom sutil
+        transition: 'transform 0.5s ease-in-out',
+      }}
+    >
+      <source src="/logos/demo.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  </Box>
+</Grid>
+
 
         <Grid item xs={12} md={4}>
           <Box sx={{ ...cardStyle}}>
