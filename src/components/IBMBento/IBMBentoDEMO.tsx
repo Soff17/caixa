@@ -6,7 +6,7 @@ import Image from 'next/image';
 const technologies = [
     { name: 'rag', img: '/logos/rag.png', link: '#' },
     { name: 'llm', img: '/logos/llm.png', link: '#' },
-    { name: 'ml', img: '/logos/ml.png', link: '#' }
+    { name: 'genai', img: '/logos/genAI.png', link: '#' }
 ];
 
 interface WatsonAssistantReceiveEvent {
@@ -26,18 +26,6 @@ interface ViewChangeEvent {
   newViewState: {
     mainWindow: boolean;
   };
-}
-
-interface WatsonChatInstance {
-  changeView: (view: string) => void;
-  restartConversation: (...args: unknown[]) => Promise<void>;
-  send: (message: { input: { message_type: string; text: string } }, options: { silent: boolean }) => Promise<void>;
-  on: (event: 
-    | { type: 'view:change'; handler: (e: ViewChangeEvent) => void } 
-    | { type: 'receive'; handler: (e: WatsonAssistantReceiveEvent) => void }
-  ) => void;
-  updateLocale: (locale: string) => Promise<void>;
-  render: () => Promise<void>;
 }
 
 interface WatsonChatInstance {
