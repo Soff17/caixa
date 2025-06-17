@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react'; // añade useState
 import { Box, Typography, Grid, IconButton, Tooltip } from '@mui/material';
 import { Launch } from '@mui/icons-material';
-import Image from 'next/image';
 
 const technologies = [
-    { name: 'rag', img: '/logos/rag.png', link: '#' },
-    { name: 'llm', img: '/logos/llm.png', link: '#' },
-    { name: 'ml', img: '/logos/ml.png', link: '#' }
+    { name: 'Watsonx.ai', img: '/logos/watsonx.png', link: '#' },
+    { name: 'Orchestrate', img: '/logos/orchestrate.png', link: '#' },
+    { name: 'Discovery', img: '/logos/discovery.png', link: '#' }
 ];
 
 interface WatsonChatInstance {
@@ -21,102 +20,72 @@ interface WatsonChatInstance {
 declare global {
   interface Window {
     webChatInstance?: WatsonChatInstance;
-    watsonAssistantChatOptions?: any; // 👈 esta línea es la que soluciona el error
   }
 }
 
-
 const IBMBento = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [assistantResponse, setAssistantResponse] = useState<string | null>(null);
-
   useEffect(() => {
-    window.watsonAssistantChatOptions = {
-      integrationID: '43f4794e-e91e-4464-a8f1-beaa019a5309',
-      region: 'wxo-us-south',
-      serviceInstanceID: '727fcb04-1caa-4c7b-8051-138f5a41ee3d',
-      headerConfig: {
-        minimizeButtonIconType: 'close',
-        showRestartButton: false
-      },
-      showLauncher: false,
-      layout: {
-        showFrame: false,
-      },
-      onLoad: async (instance: any) => {
-        window.webChatInstance = instance;
-  
-        const invokeInitial = {
-          input: {
-            message_type: 'text',
-            text: 'IBM'
-          }
-        };
-        const sendOptions = { silent: true };
-  
-        const originalRestart = instance.restartConversation.bind(instance);
-  
-        instance.restartConversation = async function (...args: any[]) {
-          await originalRestart(...args);
-          await instance.send(invokeInitial, sendOptions).catch(console.error);
-        };
-  
-        instance.on({
-          type: 'view:change',
-          handler: (event: any) => {
-            const launcherBtn = document.querySelector('.custom-launcher') as HTMLElement;
-            if (launcherBtn) {
-              launcherBtn.style.display = event.newViewState.mainWindow ? 'none' : '';
-              window.dispatchEvent(new CustomEvent("watson-chat-open", { detail: event.newViewState.mainWindow }));
-            }
-          },
-        });
-  
-        // Aquí escuchamos la respuesta y la mandamos por evento personalizado
-        instance.on({
-            type: 'receive',
-            handler: (event: any) => {
-              const messages = event.data?.output?.generic || [];
-          
-              let responseText = '';
-          
-              messages.forEach((msg: any) => {
-                if (msg.response_type === 'text') {
-                  responseText += msg.text + '\n';
-                } else if (msg.response_type === 'option') {
-                  responseText += msg.title + '\n';
-                  msg.options.forEach((opt: any) => {
-                    responseText += `• ${opt.label}\n`;
-                  });
-                }
-              });
-          
-              window.dispatchEvent(new CustomEvent("watson-assistant-response", { detail: responseText }));
-            }
-          });          
-  
-        await instance.updateLocale('es');
-        await instance.render();
-        await instance.restartConversation();
-      }
-    };
-  
     const script = document.createElement('script');
-    script.src = 'https://web-chat.global.assistant.watson.appdomain.cloud/versions/latest/WatsonAssistantChatEntry.js';
-    document.head.appendChild(script);
-  }, []);  
-
-  useEffect(() => {
-    const handleAssistantResponse = (e: CustomEvent) => {
-      setAssistantResponse(e.detail);
-      console.log('Respuesta guardada:', e.detail); // opcional
-    };
-  
-    window.addEventListener('watson-assistant-response', handleAssistantResponse as EventListener);
-  
-    return () => {
-      window.removeEventListener('watson-assistant-response', handleAssistantResponse as EventListener);
-    };
+    script.innerHTML = `
+      window.watsonAssistantChatOptions = {
+        integrationID: '43f4794e-e91e-4464-a8f1-beaa019a5309',
+        region: 'wxo-us-south',
+        serviceInstanceID: '727fcb04-1caa-4c7b-8051-138f5a41ee3d',
+        headerConfig: {
+          minimizeButtonIconType: 'close',
+          showRestartButton: false
+        },
+        showLauncher: false,
+        layout: {
+          showFrame: false,
+        },
+        onLoad: async (instance) => {
+          window.webChatInstance = instance;
+        
+          const invokeInitial = {
+            input: {
+              message_type: 'text',
+              text: 'IBM'
+            }
+          };
+          const sendOptions = { silent: true };
+        
+          const originalRestart = instance.restartConversation.bind(instance);
+        
+          instance.restartConversation = async function (...args) {
+            await originalRestart(...args);
+            await instance.send(invokeInitial, sendOptions).catch(console.error);
+          };
+        
+          instance.on({
+            type: 'view:change',
+            handler: (event) => {
+              const launcherBtn = document.querySelector('.custom-launcher');
+              if (event.newViewState.mainWindow) {
+                launcherBtn.style.display = 'none';
+                window.dispatchEvent(new CustomEvent("watson-chat-open", { detail: true }));
+              } else {
+                launcherBtn.style.display = '';
+                window.dispatchEvent(new CustomEvent("watson-chat-open", { detail: false }));
+              }
+            },
+          });
+        
+          await instance.updateLocale('es');
+          await instance.render();
+          await instance.restartConversation();
+        }          
+      };
+      setTimeout(function(){
+        const t = document.createElement('script');
+        t.src = 'https://web-chat.global.assistant.watson.appdomain.cloud/versions/' + 
+                (window.watsonAssistantChatOptions.clientVersion || 'latest') + 
+                '/WatsonAssistantChatEntry.js';
+        document.head.appendChild(t);
+      }, 0);
+    `;
+    document.body.appendChild(script);
   }, []);
   
   useEffect(() => {
@@ -189,7 +158,7 @@ const IBMBento = () => {
           },
         }}
       >
-        <Box sx={{ fontSize: 28 }}><Image src="/logos/bot.png" alt="IBM" width={100} height={100} /></Box>
+        <Box sx={{ fontSize: 28 }}><img src="/logos/bot.png" alt="IBM" style={{ width: '100%', objectFit: 'contain' }} /></Box>
       </Box>
 
       {!isChatOpen && (
@@ -206,10 +175,10 @@ const IBMBento = () => {
         <Grid item xs={12} md={2}>
           <Box sx={{ ...cardStyle, gap: 2, p: 0, backgroundColor: 'transparent', boxShadow: 'none' }}>
             <Box sx={{ ...cardStyle, alignItems: 'center', justifyContent: 'center', flex: 1, backgroundColor:'#e01288'}}>
-              <Image src="/logos/nds.png" alt="NDS" width={140} height={100} />
+              <img src="/logos/nds.png" alt="NDS" style={{ width: '70%', objectFit: 'contain' }} />
             </Box>
-            <Box sx={{ ...cardStyle, alignItems: 'center', justifyContent: 'center', flex: 1, backgroundColor:'white' }}>
-              <Image src="/logos/kp.png" alt="IBM" width={120} height={120} />
+            <Box sx={{ ...cardStyle, alignItems: 'center', justifyContent: 'center', flex: 1, backgroundColor:'#113b5e' }}>
+              <img src="/logos/ibm.png" alt="IBM" style={{ width: '70%', objectFit: 'contain' }} />
             </Box>
           </Box>
         </Grid>
@@ -264,7 +233,7 @@ const IBMBento = () => {
               Características principales
             </Typography>
             <Typography variant="body2" sx={{ color: '#ccc', mb: 3 }}>
-              Tecnología que combina IA, flujos automáticos y conocimientos de CVs para recomendar candidatos ideales.
+              Tecnología IBM que combina IA, flujos automáticos y conocimientos de CVs para recomendar candidatos ideales.
             </Typography>
 
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
@@ -324,16 +293,8 @@ const IBMBento = () => {
 
 
         <Grid item xs={12} md={2}>
-          <Box
-            sx={{
-              ...cardStyle,
-              backgroundColor: '#1f70c1',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Image src="/logos/bot.png" alt="IBM" width={200} height={170} />
+          <Box sx={{ ...cardStyle, backgroundColor:'#1f70c1'}}>
+            <img src="/logos/bot.png" alt="IBM" style={{ width: '100%', objectFit: 'contain' }} />
           </Box>
         </Grid>
 
