@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-    title: "IBM Solution Day",
-    description: "Explora las soluciones inteligentes de IBM para selección de talento: IA, automatización y análisis avanzado de CVs para encontrar a los candidatos ideales.",
+    title: "Talent Bot",
+    description: "Explora las soluciones inteligentes para selección de talento: IA, automatización y análisis avanzado de CVs para encontrar a los candidatos ideales.",
 };
 
 export default function RootLayout({
