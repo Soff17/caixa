@@ -4,8 +4,24 @@ import { useEffect, useRef, useState } from 'react';
 import { Box, Button, Typography, CircularProgress } from '@mui/material';
 import Image from 'next/image';
 
+interface WatsonChatInstance {
+    changeView: (view: string) => void;
+    restartConversation: (...args: unknown[]) => Promise<void>;
+    send: (message: { input: { message_type: string; text: string } }, options: { silent: boolean }) => Promise<void>;
+    updateLocale: (locale: string) => Promise<void>;
+    render: () => Promise<void>;
+  }
+  
+declare global {
+interface Window {
+    webChatInstance?: WatsonChatInstance;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    watsonAssistantChatOptions?: any;
+}
+}
+  
 const Page = () => {
-  const [chatInstance, setChatInstance] = useState<any>(null);
+const [chatInstance, setChatInstance] = useState<WatsonChatInstance | null>(null);
   const [loading, setLoading] = useState(false);
   const isRendered = useRef(false);
 
@@ -17,7 +33,7 @@ const Page = () => {
       region: 'wxo-us-south',
       serviceInstanceID: '727fcb04-1caa-4c7b-8051-138f5a41ee3d',
       showLauncher: false,
-      onLoad: async (instance: any) => {
+      onLoad: async (instance: WatsonChatInstance) => {
         window.webChatInstance = instance;
         setChatInstance(instance);
         await instance.updateLocale('es');
