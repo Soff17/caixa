@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-    title: "Talent Bot",
+    title: "Bank Bot",
     description: "Explora las soluciones inteligentes para selección de talento: IA, automatización y análisis avanzado de CVs para encontrar a los candidatos ideales.",
 };
 
